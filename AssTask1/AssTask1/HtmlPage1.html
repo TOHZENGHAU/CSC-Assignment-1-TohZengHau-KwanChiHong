@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="Scripts/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnClick').click(function () {
+                //var requestData = $('#txtDate').val();
+                var output = $('#output');
+                $.ajax({
+                    url: 'https://api.data.gov.sg/v1/environment/24-hour-weather-forecast',
+                    method: 'get',
+                    //data: { date_time: requestData },
+                    dataType: 'json',
+                    success: function (data) {
+                        output.append('Forecast: ' + data.items[0].general.forecast +
+                            '<br/> Relatively Humidity </br> Low: ' + data.items[0].general.relative_humidity.low + 
+                            '<br/> High: ' + data.items[0].general.relative_humidity.high +
+                            '<br/> Wind Speed : <br/> Low :' + data.items[0].general.wind.speed.low + '<br/> High : ' + data.items[0].general.wind.speed.high +
+                            '<br/> Direction:' + data.items[0].general.wind.direction)
+                    }
+                })
+            })
+        })
+
+    </script>
+</head>
+<body>
+    <!--<table>
+        <tr>
+            <td>Date</td>
+            <td><input type="datetime" id="txtDate"></td>
+        </tr>
+    </table>-->
+    <input type="button" id="btnClick" value="Get Result">
+    <div id="output"></div>
+</body>
+</html>
