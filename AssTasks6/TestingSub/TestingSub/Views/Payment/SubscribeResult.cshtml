@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewData["Title"] = "SubscribeResult";
+}
+
+<h2>SubscribeResult</h2>
+
+<div id="result"></div>
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    const subscription = @Html.Raw(ViewBag.subscription);
+    const { latest_invoice } = subscription;
+    const { payment_intent } = latest_invoice;
+
+    var res = document.getElementById('result');
+
+    if (payment_intent) {
+        const { client_secret, status } = payment_intent;
+
+        if (status === 'requires_action') {
+            var stripe = Stripe('@ViewBag.stripeKey');
+
+            stripe.confirmCardPayment(client_secret).then(function(result) {
+                if (result.error) {
+                    // Display error message in your UI.
+                    // The card was declined (i.e. insufficient funds, card has expired, etc)
+                    res.textContent = result.error.message;
+                } else {
+                    // Show a success message to your customer
+                    res.textContent = "Your subscription was successfully authenticated"
+                }
+            });
+        } else {
+            // No additional information was needed
+            // Show a success message to your customer
+            res.textContent = "Your subscription was successfully setup"
+        }
+    }
+        function stripeTokenHandler(token) {
+        // Insert the token ID into the form so it gets submitted to the server
+        var form = document.getElementById('payment-form');
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', token.id);
+        form.appendChild(hiddenInput);
+
+        // Submit the form
+        form.submit();
+    }
+</script>
+@*<form asp-controller="Payment" asp-action="CancelSubscription" id="payment-form" method="delete" style="width:100%;">
+    <button>Cancel Subscription</button>
+</form>*@
+<form asp-controller="Payment" asp-action="CustomerPortal" id="payment-form" method="post" style="width:100%;">
+    <button type="submit">Manage billing</button>
+</form>
