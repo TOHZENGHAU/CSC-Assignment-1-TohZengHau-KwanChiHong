@@ -16,7 +16,7 @@ namespace AssTask2
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/v2/{controller}/{id}",
+                routeTemplate: "api/v3/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
         }
