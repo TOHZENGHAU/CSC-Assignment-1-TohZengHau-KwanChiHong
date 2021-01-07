@@ -9,6 +9,17 @@ using Microsoft.Extensions.Configuration;
 using Stripe;
 using Stripe.BillingPortal;
 using TestingSub.Models;
+using System.Net;using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Stripe;
+using Stripe.BillingPortal;
+using TestingSub.Models;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 
@@ -46,61 +57,76 @@ namespace TestingSub.Controllers
                 Source = stripeToken,
             };
 
-            var customerService = new CustomerService();
-            var customer = customerService.Create(customerOptions);
-            customer_id = customer.Id;
-            // Previous code in action
-
-            var planId = "";
-            if (plan == "basicPlan")
+            try
             {
-                planId = "price_1Htq5ZHQbClkzxezJlLhffk6";
-                global_plan_id = "price_1Htq5ZHQbClkzxezJlLhffk6";
-            }
-            else
-            {
-                planId = "price_1I2w4MHQbClkzxezSyy1Cd1j";
-                global_plan_id = "price_1I2w4MHQbClkzxezSyy1Cd1j";
 
-            }
+                var customerService = new CustomerService();
+                var customer = customerService.Create(customerOptions);
+                customer_id = customer.Id;
+                // Previous code in action
 
-            var subscriptionOptions = new SubscriptionCreateOptions
-            {
-                Customer = customer.Id,
-                Items = new List<SubscriptionItemOptions>
+                var planId = "";
+                if (plan == "basicPlan")
+                {
+                    planId = "price_1Htq5ZHQbClkzxezJlLhffk6";
+                    global_plan_id = "price_1Htq5ZHQbClkzxezJlLhffk6";
+                }
+                else
+                {
+                    planId = "price_1I2w4MHQbClkzxezSyy1Cd1j";
+                    global_plan_id = "price_1I2w4MHQbClkzxezSyy1Cd1j";
+
+                }
+
+                var subscriptionOptions = new SubscriptionCreateOptions
+                {
+                    Customer = customer.Id,
+                    Items = new List<SubscriptionItemOptions>
         {
             new SubscriptionItemOptions
             {
                 Plan = planId
             },
         },
-            };
-            
-            subscriptionOptions.AddExpand("latest_invoice.payment_intent");
+                };
 
-            var subscriptionService = new SubscriptionService();
-            var subscription = subscriptionService.Create(subscriptionOptions);
+                subscriptionOptions.AddExpand("latest_invoice.payment_intent");
+
+                var subscriptionService = new SubscriptionService();
+                var subscription = subscriptionService.Create(subscriptionOptions);
 
 
 
-            ViewBag.stripeKey = "pk_test_51HtmObHQbClkzxez6WOcUxOdar5GULzc7ZrGVaVtFgX4D8S76VYvFFa0HZCdmLbjBibRKlPn2xltaRghua3UGrup00zTmwT1ag";
-            ViewBag.subscription = subscription.ToJson();
-            cm.customer_id = subscription.CustomerId;
-            cm.email = email.ToString();
-            cm.subscription_status = subscription.Status;
-            if (planId == "price_1Htq5ZHQbClkzxezJlLhffk6")
-            {
-                cm.basic = "True";
-                cm.premium = "False";
+                ViewBag.stripeKey = "pk_test_51HtmObHQbClkzxez6WOcUxOdar5GULzc7ZrGVaVtFgX4D8S76VYvFFa0HZCdmLbjBibRKlPn2xltaRghua3UGrup00zTmwT1ag";
+                ViewBag.subscription = subscription.ToJson();
+                cm.customer_id = subscription.CustomerId;
+                cm.email = email.ToString();
+                cm.subscription_status = subscription.Status;
+                if (planId == "price_1Htq5ZHQbClkzxezJlLhffk6")
+                {
+                    cm.basic = "True";
+                    cm.premium = "False";
+                }
+                else
+                {
+                    cm.basic = "False";
+                    cm.premium = "True";
+                }
+
+                cm.SaveDetails();
+                return View("SubscribeResult");
             }
-            else
+            catch(Exception e)
             {
-                cm.basic = "False";
-                cm.premium = "True";
+                cm.customer_id = "not-valid";
+                cm.email = email.ToString();
+                cm.subscription_status = "not-valid";
+                cm.basic = null;
+                cm.premium = null;
+                cm.SaveDetails();
+               
+                return View("SubscribeFailed");
             }
-
-            cm.SaveDetails();
-            return View("SubscribeResult");
         }
         [AllowAnonymous]
         [HttpPost]
@@ -166,12 +192,9 @@ namespace TestingSub.Controllers
                 switch (stripeEvent.Type)
                 {
                     case "charge.succeeded":
-                        var charge = stripeEvent.Data.Object as Charge;
                         cm.RecordChargeStatus("succeed", customer_id);
-
                         break;
                     case "charge.failed":
-                        cm = new CustomerModel();
                         cm.RecordChargeStatus("failed", customer_id);
 
                         break;
@@ -179,7 +202,7 @@ namespace TestingSub.Controllers
                     case "customer.subscription.deleted":
                         cm = new CustomerModel();
                         cm.PlanRemove(customer_id);
-                        
+
                         break;
 
                     case "customer.subscription.updated":
