@@ -3,7 +3,7 @@
     <script src="https://www.google.com/recaptcha/api.js?render=6Ld3iPMZAAAAACNmwj4Q3TCbwuYvg-7YShx9Xw2d" type="text/javascript"></script>
     <script>
         grecaptcha.ready(function () {
-            grecaptcha.execute('6Ld3iPMZAAAAACNmwj4Q3TCbwuYvg-7YShx9Xw2d', { action: 'register_account' }).then(function (token) {
+            grecaptcha.execute('{RECAPTCHA CLIENT SITEKEY}', { action: 'register_account' }).then(function (token) {
                 $("#GoogleCaptchaToken").val(token).change();
                 console.log(token);
             });
