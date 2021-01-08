@@ -1,19 +1,24 @@
 <!doctype html>
 <head>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-    
+        //Upload button triggered, function called
         $(document).ready(function(){
           $("button").click(function(){
             var fileUploaded = document.getElementById('fileUpload').files[0];
-            var formData = new FormData();
+            var formData = new FormData();  //create a new formdata object
+            //Taggun APi
             var apiUrl = "https://api.taggun.io/api/receipt/v1/simple/file";
             var apiKey = "Your taggun api key";
+            //Trigger Loader
             $("#loader").css("display", "block");
+            //Complete the formdata object
             formData.append("file",fileUploaded);
             formData.append("language","en");
             formData.append("extractTime",true);
 
+        //ajax method 
         $.ajax({
             url : apiUrl,
             method : "POST",
@@ -25,7 +30,9 @@
             data : formData,
             success:function(data){
                 console.log(data);
+                //Assign data and show in front-end
                 var convidence = data.confidenceLevel ;
+                //It has a higher percentage that it is a Receipt image if the convidence more than 0.5
                 if(convidence >= 0.5){
                  let msgTotal = "The total amount :  " + data.totalAmount.data;
                  let msgTax = "The tax amount :  " + data.taxAmount.data;
@@ -48,6 +55,7 @@
                     $('#address').text(msgAddress);
                  }
                 }
+                //it might not be a receipt image
                 else{
                     let confidenceLevel = "Confidence Level :  " + data.confidenceLevel;
                     let msgReceipt = "Is the image a RECEIPT ? :  FALSE";
@@ -60,18 +68,14 @@
                     $('#merchant').text(clear);
                     $('#address').text(clear);
                 }
-
+                //After the process finish,close the loader
                 $("#loader").css("display", "none");
               }    
             });
             
           });
         });
-
-        // var totalMsg = "The total amount = "+data.totalAmount.data;
-                // console.log(totalMsg);
-        
-        
+        //function for load picture
         var loadFile = function(event) {
             var image = document.getElementById('uploadImg');
             image.src = URL.createObjectURL(event.target.files[0]);
