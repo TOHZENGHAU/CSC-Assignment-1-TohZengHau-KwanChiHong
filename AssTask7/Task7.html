@@ -8,7 +8,7 @@
             var fileUploaded = document.getElementById('fileUpload').files[0];
             var formData = new FormData();
             var apiUrl = "https://api.taggun.io/api/receipt/v1/simple/file";
-            var apiKey = "92238e70511c11ebafc7c5a18819396c";
+            var apiKey = "Your taggun api key";
             $("#loader").css("display", "block");
             formData.append("file",fileUploaded);
             formData.append("language","en");
