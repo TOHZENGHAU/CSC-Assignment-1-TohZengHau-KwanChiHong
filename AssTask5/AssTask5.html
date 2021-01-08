@@ -1,246 +1,256 @@
 <!doctype html>
 <head>
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.357.0.min.js"></script>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script type="text/javascript">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.357.0.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
 
-var accessKeyId = 'Your access key Id';
-var secretAccessKey = 'Your secret access key';
-var sessionToken = 'Your session token';
-var region = 'us-east-1';
-var bucketName = 'kwan-harry-ca1-task5' ;
-var ACL = "public-read";
-var Url = "";
-//Bucket Configurations
+        //Instantiate AWS variables
+        var accessKeyId = 'Your access key Id';         
+        var secretAccessKey = 'Your secret access key';
+        var sessionToken = 'Your session token';
+        var region = 'us-east-1';
+        var bucketName = 'kwan-harry-ca1-task5' ;
+        var ACL = "public-read";
+        var Url = "";
+
+        //AWS and S3 Bucket Configurations
         AWS.config.update({
 
-                    accessKeyId: accessKeyId,
-                    secretAccessKey: secretAccessKey,
-                    sessionToken: sessionToken  
+        accessKeyId: accessKeyId,
+        secretAccessKey: secretAccessKey,
+        sessionToken: sessionToken  
 
-                  });
+        });
 
         AWS.config.region = region;
-
+        //Bucket Object
         var s3 = new AWS.S3({
-                
-                params: { Bucket: bucketName+'/TalentImages' }
 
-            });
+        params: { Bucket: bucketName+'/TalentImages' }
 
+        });
+        //function that allow user to upload file to AWS S3 
         function uploadFile() {
-            
-            var file = document.getElementById('fileUpload').files[0];
-            var fileName = String(file.name);
-            var preview = document.querySelector('img');
-            
-            if (file&& (fileName.includes(".jpg")||fileName.includes(".png")
-            ||fileName.includes(".jpeg")))
-            {
-                
-                document.getElementById("errorMessage").style.display = "none";
-                s3.putObject({
-                    Key: file.name,
-                    ContentType: file.type,
-                    Body: file,
-                    ACL: ACL
-                },
-                function(err, data,url) {
+        //Variables
+        var file = document.getElementById('fileUpload').files[0];
+        var fileName = String(file.name);
+        var preview = document.querySelector('img');
 
-                                    if(err) {
+        //file validation
+        if (file&& (fileName.includes(".jpg")||fileName.includes(".png")
+        ||fileName.includes(".jpeg")))
+        {
 
-                                        reject('error');
+        document.getElementById("errorMessage").style.display = "none";
+        //AWS SDK method
+        s3.putObject({
+        Key: file.name,
+        ContentType: file.type,
+        Body: file,
+        ACL: ACL
+        },
+        //code for response from AWS
+        function(err, data,url) {
 
-                                    }
-                                    alert('Successfully Uploaded!');
-                                }).on('httpUploadProgress', function (progress) {
+        if(err) {
 
-                                    var uploaded = parseInt((progress.loaded * 100) / progress.total);
-                                    $("progress").attr('value', uploaded);
-                                    
-                                });
-                                
-                                 Url= `https://${bucketName}.s3.amazonaws.com/TalentImages/${fileName}`;
-                                 preview.src = Url;
-                                 document.getElementById("preview").style.display = "block";
-                                 var awsLongUrl = document.getElementById("imageUrl")
-                                 awsLongUrl.innerText = "The AWS Url : " ;
-                                 var temp_link = document.createElement("a");
-                                 temp_link.href = Url;
-                                 temp_link.innerHTML = Url;   
-                                 temp_link.style.color = "blue";
-                                 temp_link.target = '_blank';
-                                 awsLongUrl.appendChild(temp_link);
-                                 //document.getElementById("imgNavUrl").
-                                
-            }else{
-
-                console.dir("wrong file type");
-                document.getElementById("errorMessage").innerText = "Error File Type ! ! !";
-                document.getElementById("errorMessage").style.display= "block";
-                document.getElementById("errorMessage").style.color = "red";
-                alert('Upload .jpeg/.jpg/.png format file only');
-                $("progress").attr('value', "0.1");
-                document.getElementById("preview").style.display = "none";
-                
-            }
+        reject('error');
 
         }
-        
-        function ShortLinkBitly() { /*pLongUrl is the long URL*/
-            var apiKey = 'Your API Key';
-            var username = 'Your Username';
+        alert('Successfully Uploaded!');
+        }).on('httpUploadProgress', function (progress) {
 
-        /*Ajax call*/
+        var uploaded = parseInt((progress.loaded * 100) / progress.total);
+        $("progress").attr('value', uploaded);
+
+        });
+
+        Url= `https://${bucketName}.s3.amazonaws.com/TalentImages/${fileName}`;
+        preview.src = Url;
+        document.getElementById("preview").style.display = "block";
+        var awsLongUrl = document.getElementById("imageUrl")
+        awsLongUrl.innerText = "The AWS Url : " ;
+        var temp_link = document.createElement("a");
+        temp_link.href = Url;
+        temp_link.innerHTML = Url;   
+        temp_link.style.color = "blue";
+        temp_link.target = '_blank';
+        awsLongUrl.appendChild(temp_link);
+
+
+        }//code run for wrong file type
+        else{
+
+        console.dir("wrong file type");
+        document.getElementById("errorMessage").innerText = "Error File Type ! ! !";
+        document.getElementById("errorMessage").style.display= "block";
+        document.getElementById("errorMessage").style.color = "red";
+        alert('Upload .jpeg/.jpg/.png format file only');
+        $("progress").attr('value', "0.1");
+        document.getElementById("preview").style.display = "none";
+
+        }
+
+        }
+        // function that help to shorten the Long link
+        function ShortLinkBitly() { 
+        //Bitly variables
+        var apiKey = 'Your API Key';
+        var username = 'Your Username';
+
+        /*Bitly Ajax call*/
         $.ajax({
         url: 'https://api-ssl.bitly.com/v3/shorten?login=' + username + '&access_token=' + apiKey + '&format=json&longUrl=' + encodeURIComponent(Url),
         type : 'POST',
 
         success: function(response) {
-          
-            console.log(response);
-            console.log(response.data.url);
-            document.getElementById("shortUrl").innerText = "Short Url for the Image : " + response.data.url;
-            var bitLyShortUrl = document.getElementById("shortUrl")
-            bitLyShortUrl.innerText = "Short Url for the Image : " ;
-            var temp_link = document.createElement("a");
-            temp_link.href = response.data.url;
-            temp_link.innerHTML = response.data.url;  
-            temp_link.target = '_blank'; 
-            temp_link.style.color = "blue";
-            bitLyShortUrl.appendChild(temp_link);
 
-            if (response.status_code == 500) {
+        console.log(response);
+        console.log(response.data.url);
+        document.getElementById("shortUrl").innerText = "Short Url for the Image : " + response.data.url;
+        var bitLyShortUrl = document.getElementById("shortUrl")
+        bitLyShortUrl.innerText = "Short Url for the Image : " ;
+        var temp_link = document.createElement("a");
+        temp_link.href = response.data.url;
+        temp_link.innerHTML = response.data.url;  
+        temp_link.target = '_blank'; 
+        temp_link.style.color = "blue";
+        bitLyShortUrl.appendChild(temp_link);
 
-                /*500 status code means the link is malformed.*/
-                return "Error: Invalid link.";
+        if (response.status_code == 500) {
 
-            } else if (response.status_code != 200) {
+        /*500 status code means the link is malformed.*/
+        return "Error: Invalid link.";
 
-                /*If response is not 200 then an error ocurred. It can be a network issue or bitly is down.*/
-                return "Error: Service unavailable.";
+        } else if (response.status_code != 200) {
 
-            }
-            else
-                return response.data.url; /* OK, return the short link */
+        /*If response is not 200 then an error ocurred. It can be a network issue or bitly is down.*/
+        return "Error: Service unavailable.";
+
+        }
+        else
+        return response.data.url; /* OK, return the short link */
         },
         error: function (response) {
-            console.log(response);
+        console.log(response);
         },
 
         contentType: 'application/json'
-    });
+        });
 
-}
-
-    function refresh(){
+        }
+        //functtion that allow user reload the image
+        function refresh(){
         var preview = document.querySelector('img');
         preview.src = Url;
-    }
+        }
 
-    $(document).ready(
-    function(){
+        $(document).ready(
+        function(){
         $('input:file').change(
-            function(){
-                if ($(this).val()) {
-                    
-                    $('button').removeAttr('disabled');
-                    $('button').css('background-color','white');
-                    $('button').css('color','black');
-                } 
-            }
-            );
-    });
-        
-</script>
-<style>
-    body{
-        background-image : url("darkBackground.jpg");
-    }
-    p{
-        color : white ;
-    }
-    input{
-        color : white ;
-    }
-    button{
-        color : white ;
-    }
-    #container{
-        width  : 60vw ;
-        height : auto ;
-        max-height :100vw ;
-        border : 1px solid white ;
-        margin : 0 auto ;
-        padding : 1vw ;
-    }
-    #uploadContainer{
-        padding : 1vw ;
-        height : auto ;
-        width : 100% ;
-    }
-    #uploadContainer input{
-        width : 100% ;
-        margin : 1vw 0 ;
-    }
-    #uploadContainer button{
-        width : auto ;
-        border : 1px solid white ;
-        border-radius : 3px ;
-        margin : 1vw 0 ;
-    }
-    #errorMessage{
-        display : none ; 
-        font-size : 2.5vw ;
-    }
-    #preview{
-        display : none ;
-        width : 100% ; 
-        height : auto ;
-        border : 1.5px dotted grey ;
-    }
-    #preview img{
-        max-width : 20vw ;
-        max-height : 20vw ;
-    }   
-    #preview p{
-        padding-left : 2vw ;
-        padding-right : 2vw ;
-        width : auto ;
-    }
-    .photoCon{
-        margin-top : 1vw ;
-        width : 100% ;
-        text-align : center ;
-    }
+        function(){
+        if ($(this).val()) {
 
-    #btnConvert{ 
-        margin-left : 2vw ;
-    }
-</style>
+        $('button').removeAttr('disabled');
+        $('button').css('background-color','white');
+        $('button').css('color','black');
+        } 
+        }
+        );
+        });
+
+    </script>
+
+    <style>
+        body{
+            background-image : url("darkBackground.jpg");
+        }
+        p{
+            color : white ;
+        }
+        input{
+            color : white ;
+        }
+        button{
+            color : white ;
+        }
+        #container{
+            width  : 60vw ;
+            height : auto ;
+            max-height :100vw ;
+            border : 1px solid white ;
+            margin : 0 auto ;
+            padding : 1vw ;
+        }
+        #uploadContainer{
+            padding : 1vw ;
+            height : auto ;
+            width : 100% ;
+        }
+        #uploadContainer input{
+            width : 100% ;
+            margin : 1vw 0 ;
+        }
+        #uploadContainer button{
+            width : auto ;
+            border : 1px solid white ;
+            border-radius : 3px ;
+            margin : 1vw 0 ;
+        }
+        #errorMessage{
+            display : none ; 
+            font-size : 2.5vw ;
+        }
+        #preview{
+            display : none ;
+            width : 100% ; 
+            height : auto ;
+            border : 1.5px dotted grey ;
+        }
+        #preview img{
+            max-width : 20vw ;
+            max-height : 20vw ;
+        }   
+        #preview p{
+            padding-left : 2vw ;
+            padding-right : 2vw ;
+            width : auto ;
+        }
+        .photoCon{
+            margin-top : 1vw ;
+            width : 100% ;
+            text-align : center ;
+        }
+
+        #btnConvert{ 
+            margin-left : 2vw ;
+        }
+    </style>
+
 </head>
 <body>
-    <!-- A functional html code-->
     <div id = "container">
-    <div id = "uploadContainer">
-        <input type = "file" id = "fileUpload">
-        <button id = "btnUpload" onclick = "uploadFile()" disabled>Upload To AWS S3</button>
-        <p>Progress Bar :   </p>
-        <progress max = ”100” value = ”0” id = "uploadProgress"></progress>   
-        <p id = "errorMessage"></p> 
+        <div id = "uploadContainer">
+            <input type = "file" id = "fileUpload">
+            <button id = "btnUpload" onclick = "uploadFile()" disabled>Upload To AWS S3</button>
+            <p>Progress Bar :   </p>
+            <progress max = â€�100â€� value = â€�0â€� id = "uploadProgress"></progress>   
+            <p id = "errorMessage"></p> 
+        </div>
+
+        <div id = "preview" >
+            <div class = "photoCon">
+                <img id = "photo" src = "" alt = "Image preview" width = "auto" height = "auto">
+            </div>
+
+            <div class = "photoCon">
+                <button onclick = "refresh()">Refresh the Pic</button>
+            </div>
+
+            <p id = "imageUrl" ><a id = "imgNavUrl"></a></p>
+            <button id = "btnConvert" onclick = "ShortLinkBitly()">Convert Link</button>
+            <P id = "shortUrl"></P>
+        </div>   
     </div>
- 
-    <div id = "preview" >
-        <div class = "photoCon">
-        <img id = "photo" src = "" alt = "Image preview" width = "auto" height = "auto">
-        </div>
-        <div class = "photoCon">
-        <button onclick = "refresh()">Refresh the Pic</button>
-        </div>
-        <p id = "imageUrl" ><a id = "imgNavUrl"></a></p>
-        <button id = "btnConvert" onclick = "ShortLinkBitly()">Convert Link</button>
-        <P id = "shortUrl"></P>
-    </div>   
-</div>
 </body>
 </html>
