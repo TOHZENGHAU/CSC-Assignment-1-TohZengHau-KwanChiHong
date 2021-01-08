@@ -33,12 +33,20 @@
                  let msgMerchant = "Merchant : " + data.merchantName.data;
                  let confidenceLevel = "Confidence Level :  " + data.confidenceLevel;
                  let msgReceipt = "Is the image a RECEIPT ? :  TRUE";
+                 let msgAddress = "Address : ";
                  $('#totalAmount').text(msgTotal);
                  $('#taxAmount').text(msgTax);
                  $('#date').text(msgDate);
                  $('#merchant').text(msgMerchant);
                  $('#confidenceLevel').text(confidenceLevel);
                  $('#isReceipt').text(msgReceipt);
+                 if(data.merchantAddress.confidenceLevel == 0){
+                     msgAddress += "-";
+                     $('#address').text(msgAddress);
+                 }else{
+                     msgAddress += data.merchantAddress.data;
+                    $('#address').text(msgAddress);
+                 }
                 }
                 else{
                     let confidenceLevel = "Confidence Level :  " + data.confidenceLevel;
@@ -50,6 +58,7 @@
                     $('#taxAmount').text(clear);
                     $('#date').text(clear);
                     $('#merchant').text(clear);
+                    $('#address').text(clear);
                 }
 
                 $("#loader").css("display", "none");
@@ -170,6 +179,7 @@
         <p id = "taxAmount"></p>
         <p id = "date"></p>
         <p id = "merchant"></p>
+        <P id = "address"></P>
         
     </div>
     
