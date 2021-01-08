@@ -4,14 +4,13 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
 
-var accessKeyId = 'ASIA3PKKKQUSAUC55IPD';
-var secretAccessKey = 'uhFNt8mjeZkk5ZzITOGd8b2o+Gn4nGmKHbPQvDZF';
-var sessionToken = 'FwoGZXIvYXdzEJf//////////wEaDLWPwbUJxtzK1ES5NiLKAdKcSF8Carf5h8OP2mZYwjf7ndu1GACkwl6//uT7R2kDXElI8ilO5QTOTj0W8pmEzX2dPEhc0y2GLaRQoczABLTSgJ/uKGVhKIzSB/QiU8ckiUTbcGBE0IWeCrKOE7Or0qTICzRG2pRqUgTQtzqr0zp9Rkxvv6ca0ALbxUrgbLygE/B1hoW3+UUNCFFfVdVdg0oDk4SJZLxueREIp/9q2hLNrFS9bFqqUZDMrsKWVQOnctEG3MaBF17+Zv6T5f4MIWWtN/wI4I1+HXMotfzd/wUyLamLTBwoGURkQw3RCZzK/YFzb+evjeFsmkxZUTKfdJYY6e+fz29kM10mnTU2pA==';
+var accessKeyId = 'ASIA3PKKKQUSOV6WZ424';
+var secretAccessKey = 'w9EjII3Et1l//ry0x+2chUJMH1N/cgTyJpAVRSUi';
+var sessionToken = 'FwoGZXIvYXdzEKT//////////wEaDDhjLNe7+gfnkdKm7iLKAYZnHgF44Eu+mcL6o6itJ/HLvmOBoGPJ51z27b5HNsW3Qo5TOnTXiBT4PB4rMIp3+K3aYoDRIcFEbKlFj1ROoczO6MSXqdesb4sNf3kfvDNOcd1XJUn4IHK81Oz1tFWhigwzXtoz0RhbuSaLDSlCj5UJmPp5vaPlbfS2JtVkHh0zKChAH33mDC3bP2UgVn8dIGTF7ioq9h6Ab1hRY2zfcJpj1HeS57/U1xyvkU73qxI0G4hC4v0gSqn8prwJ2IfwPA3EeDwiya+izdMogO3g/wUyLWc3zrkd7doRRDTPNjb1qC3OhNlHQywlp48Sgb+ScKobqRJ1ZqoNtWFLbZ4dJg==';
 var region = 'us-east-1';
 var bucketName = 'kwan-harry-ca1-task5' ;
 var ACL = "public-read";
 var Url = "";
-
 //Bucket Configurations
         AWS.config.update({
 
@@ -25,7 +24,7 @@ var Url = "";
 
         var s3 = new AWS.S3({
                 
-                params: { Bucket: bucketName }
+                params: { Bucket: bucketName+'/TalentImages' }
 
             });
 
@@ -61,7 +60,7 @@ var Url = "";
                                     
                                 });
                                 
-                                 Url= `https://${bucketName}.s3.amazonaws.com/${fileName}`;
+                                 Url= `https://${bucketName}.s3.amazonaws.com/TalentImages/${fileName}`;
                                  preview.src = Url;
                                  document.getElementById("preview").style.display = "block";
                                  var awsLongUrl = document.getElementById("imageUrl")
