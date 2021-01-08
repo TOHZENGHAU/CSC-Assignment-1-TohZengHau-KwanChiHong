@@ -38,7 +38,7 @@ namespace TestingSub.Controllers
         public PaymentController(IConfiguration configuration)
         {
             _configuration = configuration;
-            StripeConfiguration.ApiKey = "sk_test_51HtmObHQbClkzxezsIKa0GNcvyKMngwztyFvlxirWE6QW4YKGADejt1ay8rTZqY4VvBu8a4aSTgYpNMtpLHJVBpC00P6J1uOX3";
+            StripeConfiguration.ApiKey = "{STRIPE SECRET KEY}";
 
         }
 
@@ -97,7 +97,7 @@ namespace TestingSub.Controllers
 
 
 
-                ViewBag.stripeKey = "pk_test_51HtmObHQbClkzxez6WOcUxOdar5GULzc7ZrGVaVtFgX4D8S76VYvFFa0HZCdmLbjBibRKlPn2xltaRghua3UGrup00zTmwT1ag";
+                ViewBag.stripeKey = "{PUBLIC KEY};
                 ViewBag.subscription = subscription.ToJson();
                 cm.customer_id = subscription.CustomerId;
                 cm.email = email.ToString();
@@ -131,48 +131,7 @@ namespace TestingSub.Controllers
         [AllowAnonymous]
         [HttpPost]
         public IActionResult SubscriptionWebhook()
-        {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            CustomerModel cm = new CustomerModel();
-            List<CustomerModel> a = new List<CustomerModel>();
-            //for (int i = 0; i < cm.getDetails().Count; i++)
-            //{
-            //    a.Add(cm.getDetails()[0]);
-            //}
-            string signingSecret = "whsec_02HFvETnFAaa3nKAsqNHpQAz40qGCytH";
-
-            var json = new StreamReader(HttpContext.Request.Body).ReadToEnd();
-            var stripeEvent = EventUtility.ConstructEvent(json,
-                Request.Headers["Stripe-Signature"],
-                signingSecret);
-
-            if (stripeEvent == null)
-            {
-                return BadRequest("Event was null");
-            }
-
-            switch (stripeEvent.Type)
-            {
-                case "charge.succeeded":
-                    // Do something with the event for when the payment goes through
-                    //for (int i = 0; i < cm.getDetails().Count; i++)
-                    //{
-                    //    if (customer_id == a[i].customer_id)
-                    //    {
-                    //        a[i].RecordChargeStatus("succeed", customer_id);
-                    //    }
-                    //}
-                    return Ok();
-                case "invoice.payment_failed":
-                    // Do something with the event for when the payment fails
-                    Invoice failInvoice = (Invoice)stripeEvent.Data.Object;
-                    return Ok();
-                default:
-                    return BadRequest("Event was not valid type");
-            }
-
-        }
 
         [AllowAnonymous]
         [HttpPost]
@@ -184,7 +143,7 @@ namespace TestingSub.Controllers
             try
             {
                 string json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-                string signingSecret = "whsec_02HFvETnFAaa3nKAsqNHpQAz40qGCytH";
+                string signingSecret = "{WEBHOOK KEY}";
 
                 var stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], signingSecret);
                 CustomerModel cm = new CustomerModel();
